@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>parentOtherMob</parentName>
+  <parentName>parentMob</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -48,16 +48,178 @@ event_inherited();
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Setup / Defaults
+            <string>/// Setup 
 
-goal = noone;
+path = path_add();
+oldPath = path_add();
+
 target = noone;
 grid = control.grid;
-
 moveSpeed = 1;
 
-maxHP = 250;
-HP = 250;
+guarding = noone;
+radius = 0;
+gx = x;
+gy = y;
+mx = x;
+my = y;
+
+maxRange = 0;
+
+alarm[0] = 2;
+alarm[11] = 1;
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="2" enumb="11">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// the rest of setup
+
+radius = guarding.guardDistance;
+gx = guarding.x;
+gy = guarding.y;
+
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="2" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>if (target == noone)
+{do
+ {mx = gx - radius + irandom(radius * 2);
+  my = gy - radius + irandom(radius * 2);}
+  until (point_distance(gx, gy, mx, my) &lt; radius)}
+
+alarm[0] = room_speed * (irandom(10) + 5);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="2">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Destroy on 0 HP
+
+if (HP &lt;= 0)
+{instance_destroy();}
 </string>
           </argument>
         </arguments>
@@ -87,8 +249,6 @@ event_inherited();
           </argument>
         </arguments>
       </action>
-    </event>
-    <event eventtype="6" enumb="0">
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -105,77 +265,35 @@ event_inherited();
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Event_inherited();
+            <string>/// basic movement &amp; targeting
 
-event_inherited();
+if (target != noone)
+{if instance_exists(target)
+ {var tx = target.x;
+  var ty = target.y;
+
+  if (point_distance(x, y, tx, ty) &gt; maxRange)
+  {if point_distance(x, y, tx, ty) &gt; radius
+   {var dir = point_direction(gx, gy, tx, ty);
+    mx = gx + lengthdir_x(radius, dir);
+    my = gy + lengthdir_y(radius, dir);}
+   else
+   {if (point_distance(mx, my, tx, ty) &gt; maxRange)
+    {mx = tx - maxRange + irandom(maxRange * 2);
+     my = ty - maxRange + irandom(maxRange * 2);}}}}
+ else
+ {target = noone;}}
+ 
+if (point_distance(x, y, mx, my) &gt; moveSpeed)
+{direction = point_direction(x, y, mx, my);
+ speed = moveSpeed;}
+else
+{x = mx;
+ y = my;
+ speed = 0;}
 </string>
           </argument>
         </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>/// Selected
-
-with control
-{scriptDeselect();
- selectMode = 2;
- mobSelected = other.id;}
-</string>
-          </argument>
-        </arguments>
-      </action>
-    </event>
-    <event eventtype="8" enumb="0">
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>/// Event_inherited();
-
-event_inherited();
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>500</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring>draw_self();</codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
       </action>
     </event>
   </events>

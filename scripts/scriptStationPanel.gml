@@ -10,7 +10,7 @@ panelStation.station = station;
 panelStation.engine = engine;
 
 if (station.object_index == objectLab)
-{show_debug_message("this is a lab");
+{//show_debug_message("this is a lab");
  buttonLoadAvailable.uiEnabled = false;
  buttonLoadType.uiEnabled = false;
  buttonLoadDestination.uiEnabled = false;
@@ -18,7 +18,7 @@ if (station.object_index == objectLab)
  buttonLoadTime.uiEnabled = false;
  buttonLoadDirection.uiEnabled = false;}
 else
-{show_debug_message("this is a station / mine");
+{//show_debug_message("this is a station / mine");
  buttonLoadAvailable.uiEnabled = true;
  buttonLoadType.uiEnabled = true;
  buttonLoadDestination.uiEnabled = true;
@@ -32,7 +32,12 @@ var cargoLastRow = ds_grid_height(sc) - 1;
 var cargoCount = max(0, ds_grid_get_sum(sc, 4, 1, 4, cargoLastRow));
 
 labelStationName.uiTextValue = station.name;
-labelCargoAmount.uiTextValue = cargoCount + " / " + station.maxCargo;
+labelCargoAmount.uiTextValue = ""
+listboxCargo.uiTextLabel = "Cargo - " + cargoCount + " / " + station.maxCargo;
+
+
+if (station.object_index == objectCoalMine)
+{labelCargoAmount.uiTextValue = string(round(station.mined)) + " mined, " + string(round(station.coal) + " left");}
 
 if (engine != noone)
 {var el = engine.load;

@@ -3,7 +3,7 @@
   <spriteName>spr_ui</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>0</depth>
+  <depth>-102</depth>
   <persistent>0</persistent>
   <parentName>ui_defaults</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -25,7 +25,10 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/*
+            <string>/// TextAni Create
+
+
+/*
 Copyright (c) 2016 NailBuster Software Inc. (david@nailbuster.com). All rights reserved.
 
 
@@ -238,7 +241,9 @@ if (CurStartIndex&lt;=tw)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>var tw,dc,c1, stepx,curp, fx,px,ymargin, curx, cury, angx, angy, ta;
+            <string>/// Draw TextAni
+
+var tw,dc,c1, stepx,curp, fx,px,ymargin, curx, cury, angx, angy, ta;
 
 event_inherited();
 if (uiZoomFactor==0.1) || (uiVisible==false) exit;  //for zooming     

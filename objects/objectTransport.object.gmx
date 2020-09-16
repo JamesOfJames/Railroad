@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>parentSelectableMob</parentName>
+  <parentName>parentEngine</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -77,8 +77,8 @@ blend = shader_get_uniform(shColorReplaceBlend, "blend");
             <string>/// Setup
 
 goal = noone;
-load = ds_grid_create(6, 1);
 ds_grid_clear(load, -5);
+guarding = noone;
 
 // Station Panel
 lastStation = noone;
@@ -92,8 +92,9 @@ name = "Globetrotter";
 maxCargo = 4;
 
 image_speed = 0;
+color = control.playerColor[owner];
 
-moveSpeed = 5.76; // from HS
+moveSpeed = .576 * 2; // 20% of HS
 
 maxHP = 1;
 HP = 1;
@@ -250,8 +251,8 @@ event_inherited();
             <string>/// Movement (self &amp; cars), Get &amp; Send Cargo
 if goal != noone // there's a goal
 {var a, gx, gy;
- gx = goal.x + grid;
- gy = goal.y + grid;
+ gx = goal.x;
+ gy = goal.y;
  a = point_distance(x, y, gx, gy);
  
  if a &gt; grid // if it's too far
@@ -361,6 +362,7 @@ ds_grid_sort(load, 4, true);
 // is there a car that needs to be created?  
 while (ds_grid_value_exists(load, 4, 1, 4, ds_grid_height(load) - 1, noone))
 {var h = instance_create(x, y, objectCar);
+ h.owner = owner;
  var i = ds_grid_value_y(load, 4, 1, 4, ds_grid_height(load) - 1, noone); // the position of the car that needs to be created
  ds_grid_set(load, 4, i, h);}
 
@@ -569,6 +571,29 @@ ds_grid_destroy(load);
         <arguments>
           <argument>
             <kind>1</kind>
+            <string>/// Event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
             <string>/// Draw Load at top left
 /*draw_set_alpha(1);
 draw_set_font(fontArialBlack12);
@@ -635,20 +660,19 @@ event_inherited();
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Color Swap Shader
+            <string>/// Color Swap Shader - good?
 
 if( shader_is_compiled(shColorReplaceBlend) )
 {shader_set(shColorReplaceBlend);
 
  // 1,1,1,1 = PURE white (each RGBA channel is 0 to 1)
- shader_set_uniform_f(colorIn, 0, 1, 0, 1);       
- shader_set_uniform_f(colorOut, 1, 0, 0, 1);
+ shader_set_uniform_f(colorIn, 0, 1, 0, 1);
+ shader_set_uniform_f(colorOut, color_get_red(color) / 256, color_get_green(color) / 256, color_get_blue(color) / 256, 1);
  shader_set_uniform_f(colorTolerance, 0.1, 0.1, 1, 1); 
  shader_set_uniform_f(blend, 1); 
 
- draw_sprite_ext(spriteEngine, 0, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha); 
- 
- shader_reset();}
+ draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);}
+shader_reset();
 </string>
           </argument>
         </arguments>

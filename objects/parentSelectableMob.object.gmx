@@ -25,7 +25,7 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// event_inherited();
+            <string>/// Event_inherited();
 
 event_inherited();
 </string>
@@ -49,6 +49,9 @@ event_inherited();
           <argument>
             <kind>1</kind>
             <string>/// Setup / Defaults
+
+path = path_add();
+oldPath = path_add();
 
 goal = noone;
 target = noone;
@@ -80,7 +83,7 @@ HP = 1;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// event_inherited();
+            <string>/// Event_inherited();
 
 event_inherited();
 </string>
@@ -128,7 +131,7 @@ if goal == noone {speed = 0;}
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// event_inherited();
+            <string>/// Event_inherited();
 
 event_inherited();
 </string>

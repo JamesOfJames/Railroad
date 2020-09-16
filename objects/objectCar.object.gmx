@@ -51,6 +51,7 @@ event_inherited();
             <string>/// Setup
 
 type = 0;
+guarding = noone;
 </string>
           </argument>
         </arguments>

@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>parentSelectableMob</parentName>
+  <parentName>parentEngine</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -77,8 +77,8 @@ blend = shader_get_uniform(shColorReplaceBlend, "blend");
             <string>/// Setup
 
 goal = noone;
-load = ds_grid_create(6, 1);
 ds_grid_clear(load, -5);
+guarding = self;
 
 // Station Panel
 lastStation = noone;
@@ -93,17 +93,22 @@ maxCargo = 0;
 
 image_speed = 0;
 image_index = 2;
+color = control.playerColor[owner];
 
 target = noone;
 
-moveSpeed = 6; // from hs
+moveSpeed = .6 * 2; // 20% of HS
 
-maxHP = 4200; // from hs
-HP = 4200; 
+maxHP = 750; // from hs
+HP = 750; 
 
-ds_list_set(modules, 0, 0); // 0 @ 0 = weak battery, 80 dps, range 120.
+//ds_list_set(modules, 0, 0); // 0 @ 0 = weak battery, 80 dps, range 120.
 ROF = room_speed;
 reload = ROF;
+damage = 15;
+maxRange = grid * 6;
+
+closest = noone;
 </string>
           </argument>
         </arguments>
@@ -257,8 +262,8 @@ event_inherited();
             <string>/// Movement (self &amp; cars), Get &amp; Send Cargo
 if goal != noone // there's a goal
 {var a, gx, gy;
- gx = goal.x + grid;
- gy = goal.y + grid;
+ gx = goal.x;
+ gy = goal.y;
  a = point_distance(x, y, gx, gy);
  
  if a &gt; grid // if it's too far
@@ -355,6 +360,7 @@ ds_grid_sort(load, 4, true);
 // is there a car that needs to be created?  
 while (ds_grid_value_exists(load, 4, 1, 4, ds_grid_height(load) - 1, noone))
 {var h = instance_create(x, y, objectCar);
+ h.owner = owner;
  var i = ds_grid_value_y(load, 4, 1, 4, ds_grid_height(load) - 1, noone); // the position of the car that needs to be created
  ds_grid_set(load, 4, i, h);}
 
@@ -370,7 +376,28 @@ for (j = 0; j &lt; ds_grid_height(load); j++)
    k.y = path_get_y(path, l);}
   else
   {show_debug_message("windmills do not work that way");}}}
-  
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// do a fite
+
 image_angle = direction;
 
 reload++;
@@ -379,10 +406,11 @@ if (target != noone)
 {if instance_exists(target)
  {if reload &gt;= ROF
   {var range = point_distance(x, y, target.x, target.y);
-   if range &lt;= 120
+//   show_debug_message(id + " firing at " +target + ", range is " + range + " of " + maxRange);
+   if range &lt;= maxRange
    {//draw a shooty particle
     reload = 0;
-    target.HP -= 80;}
+    target.HP -= damage;}
    else
    {target = noone;}}}
  else
@@ -396,6 +424,29 @@ else
   {target = enemy;}
   else
   {target = noone;}}}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Guarding
+
+closest = instance_nearest(x, y, parentGuarded);
 </string>
           </argument>
         </arguments>
@@ -676,45 +727,11 @@ event_inherited();
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Color Swap Shader
-
-if( shader_is_compiled(shColorReplaceBlend) )
-{shader_set(shColorReplaceBlend);
-
- // 1,1,1,1 = PURE white (each RGBA channel is 0 to 1)
- shader_set_uniform_f(colorIn, 0, 1, 0, 1);       
- shader_set_uniform_f(colorOut, 1, 0, 0, 1);
- shader_set_uniform_f(colorTolerance, 0.1, 0.1, 1, 1); 
- shader_set_uniform_f(blend, 1); 
-
- draw_sprite_ext(spriteEngine, 2, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha); 
- 
- shader_reset();}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
             <string>/// Draw path
-
+/*
 draw_set_colour(c_fuchsia);
 draw_path(path,x,y,true);
-/*
+
 draw_set_colour(c_navy);
 draw_path(oldPath,x,y,true);
 
@@ -756,7 +773,9 @@ for (a = 0; a &lt; path_get_number(path); a++)
 if (target != noone)
 {if instance_exists(target)
  {var a = 256 * (ROF - reload) / ROF;
-  draw_line_width_colour(x, y, target.x, target.y, 2, c_orange, make_colour_hsv(32, a, a));}
+  draw_set_alpha(0.2);
+  draw_line_width_colour(x, y, target.x, target.y, 2, c_red, make_colour_hsv(32, a, a));
+  draw_set_alpha(1);}
  else
  {target = noone;}}
 </string>
@@ -782,6 +801,93 @@ if (target != noone)
             <string>/// how large is the cargo/load grid?
 
 //draw_text(x, y, string(ds_grid_height(load)));
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Draw HP
+
+draw_set_colour(c_dkgray);
+draw_rectangle(x - 12, y + 20, x + 12, y + 24, false);
+draw_set_colour(c_green);
+draw_rectangle(x - 12, y + 20, x - 12 + (24 * (max(HP, 0) / maxHP)), y + 24, false);
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Draw Range
+
+draw_set_colour(c_red);
+draw_set_alpha(0.2);
+draw_circle(x, y, maxRange, true);
+draw_set_alpha(0.1);
+draw_circle(x, y, maxRange, false);
+draw_set_alpha(1);
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Color Swap Shader - good?
+
+if( shader_is_compiled(shColorReplaceBlend) )
+{shader_set(shColorReplaceBlend);
+
+ // 1,1,1,1 = PURE white (each RGBA channel is 0 to 1)
+ shader_set_uniform_f(colorIn, 0, 1, 0, 1);
+ shader_set_uniform_f(colorOut, color_get_red(color) / 256, color_get_green(color) / 256, color_get_blue(color) / 256, 1);
+ shader_set_uniform_f(colorTolerance, 0.1, 0.1, 1, 1); 
+ shader_set_uniform_f(blend, 1); 
+
+ draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);}
+shader_reset();
 </string>
           </argument>
         </arguments>

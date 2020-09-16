@@ -186,32 +186,35 @@ if (!connect)
 
 mp_grid_add_rectangle(control.mpGrid, x, y, x + (2 * grid), y + (2 * grid));
 
+// MP Grid clearing
+mp_grid_clear_rectangle(control.mpGrid, x, y, x, y);
+
 if DrAw[0]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + (2 * grid), y + grid);}
+{mp_grid_clear_rectangle(control.mpGrid, x, y, x + (2 * grid), y);}
 if DrAw[1]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y - grid, x + grid, y + grid);}
+{mp_grid_clear_rectangle(control.mpGrid, x, y - (2 * grid), x, y);}
 if DrAw[2]
-{mp_grid_clear_rectangle(control.mpGrid, x - grid, y + grid, x + grid, y + grid);}
+{mp_grid_clear_rectangle(control.mpGrid, x - (2 * grid), y, x, y);}
 if DrAw[3]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + grid, y + (2 * grid));}
+{mp_grid_clear_rectangle(control.mpGrid, x, y, x, y + (2 * grid));}
 if DrAw[4]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + (2 * grid), y + grid);
- mp_grid_clear_rectangle(control.mpGrid, x + grid, y - grid, x + grid, y + grid);}
+{mp_grid_clear_rectangle(control.mpGrid, x, y, x + (2 * grid), y);
+ mp_grid_clear_rectangle(control.mpGrid, x, y - (2 * grid), x, y);}
 if DrAw[5]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y - grid, x + grid, y + grid);
- mp_grid_clear_rectangle(control.mpGrid, x - grid, y + grid, x + grid, y + grid);}
+{mp_grid_clear_rectangle(control.mpGrid, x, y - (2 * grid), x, y);
+ mp_grid_clear_rectangle(control.mpGrid, x - (2 * grid), y, x, y);}
 if DrAw[6]
-{mp_grid_clear_rectangle(control.mpGrid, x - grid, y + grid, x + grid, y + grid);
- mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + grid, y + (2 * grid));}
+{mp_grid_clear_rectangle(control.mpGrid, x - (2 * grid), y, x, y);
+ mp_grid_clear_rectangle(control.mpGrid, x, y, x, y + (2 * grid));}
 if DrAw[7]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + (2 * grid), y + grid);
- mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + grid, y + (2 * grid));}
+{mp_grid_clear_rectangle(control.mpGrid, x, y, x + (2 * grid), y);
+ mp_grid_clear_rectangle(control.mpGrid, x, y, x, y + (2 * grid));}
 if DrAw[8]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + (2 * grid), y + grid);
- mp_grid_clear_rectangle(control.mpGrid, x - grid, y + grid, x + grid, y + grid);}
+{mp_grid_clear_rectangle(control.mpGrid, x, y, x + (2 * grid), y);
+ mp_grid_clear_rectangle(control.mpGrid, x - (2 * grid), y, x, y);}
 if DrAw[9]
-{mp_grid_clear_rectangle(control.mpGrid, x + grid, y - grid, x + grid, y + grid);
- mp_grid_clear_rectangle(control.mpGrid, x + grid, y + grid, x + grid, y + (2 * grid));}
+{mp_grid_clear_rectangle(control.mpGrid, x, y - (2 * grid), x, y);
+ mp_grid_clear_rectangle(control.mpGrid, x, y, x, y + (2 * grid));}
 </string>
           </argument>
         </arguments>

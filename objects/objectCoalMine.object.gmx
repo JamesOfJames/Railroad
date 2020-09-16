@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>1</depth>
   <persistent>0</persistent>
-  <parentName>parentBuilding</parentName>
+  <parentName>parentGuarded</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -78,6 +78,8 @@ blend = shader_get_uniform(shColorReplaceBlend, "blend");
 
 platform = noone;
 image_index = 1;
+color = control.playerColor[owner];
+
 grid = control.grid;
 
 // Cargo list
@@ -85,13 +87,67 @@ cargo = ds_grid_create(6, 1);
 ds_grid_clear(cargo, -1);
 maxCargo = 8;
 
-event_user(0);
+// Coal Seams
+maxCoal = 1800;
+coal = 0;
+mined = 0;
+
+level = 1;
+
+event_user(1);
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Guard Distance
+
+grid = control.grid;
+guardDistance = grid * 6;
 </string>
           </argument>
         </arguments>
       </action>
     </event>
     <event eventtype="1" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -133,6 +189,29 @@ ds_grid_destroy(cargo);
         <arguments>
           <argument>
             <kind>1</kind>
+            <string>/// event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
             <string>/// uhh this is kinda dumb and hacky for now.
 
 event_user(0);
@@ -158,6 +237,29 @@ event_user(0);
         <arguments>
           <argument>
             <kind>1</kind>
+            <string>/// event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
             <string>/// Bring up Station Cargo panel
 
 panelStation.uiVisible = true;
@@ -167,7 +269,87 @@ scriptStationPanel(id, noone);
         </arguments>
       </action>
     </event>
+    <event eventtype="7" enumb="11">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Generate Coal Seams
+
+if (coal &lt; maxCoal)
+{// Add 3d6 * 100, + 0-99
+
+ var a = (irandom_range(1, 6) +  irandom_range(1, 6) +  irandom_range(1, 6)) * 100;
+ a += irandom(99);
+
+ coal = min(coal + a, maxCoal);
+ 
+ // update station panel?
+ }
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
     <event eventtype="7" enumb="10">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -222,7 +404,7 @@ if (max(0, ds_grid_get_sum(cargo, 4, 1, 4, a - 1)) &lt; maxCargo)
   // Current Time
   ds_grid_set(cargo, 3, a, 0); // it doesn't matter when coal is generated or delievered.
   // # of cars
-  ds_grid_set(cargo, 4, a, min(irandom(3) + 1, maxCargo - ds_grid_get_sum(cargo, 4, 1, 4, a)));
+  ds_grid_set(cargo, 4, a, min(1, maxCargo - ds_grid_get_sum(cargo, 4, 1, 4, a)));
   // direction
   ds_grid_set(cargo, 5, a, "-");
   
@@ -233,7 +415,6 @@ if (max(0, ds_grid_get_sum(cargo, 4, 1, 4, a - 1)) &lt; maxCargo)
   {show_debug_message("type " + ds_grid_get(cargo, 0, c) + ", destination " + ds_grid_get(cargo, 1, c) + ", $" + ds_grid_get(cargo, 2, c) + ", created " + ds_grid_get(cargo, 3, c) + ", qty " + ds_grid_get(cargo, 4, c));
   }*/}}}
   
-alarm_set(0, room_speed * (irandom(15) + 5));
 if (panelStation.uiVisible)
 {if (panelStation.station == id)
  {scriptStationPanel(id, panelStation.engine);}}
@@ -242,7 +423,7 @@ if (panelStation.uiVisible)
         </arguments>
       </action>
     </event>
-    <event eventtype="7" enumb="5">
+    <event eventtype="7" enumb="3">
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -259,15 +440,13 @@ if (panelStation.uiVisible)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Cleanup
+            <string>/// event_inherited();
 
-ds_grid_destroy(cargo);
+event_inherited();
 </string>
           </argument>
         </arguments>
       </action>
-    </event>
-    <event eventtype="7" enumb="3">
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -309,35 +488,71 @@ ds_grid_destroy(cargo);
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Color Swap Shader
+            <string>/// event_inherited();
 
-/*if( shader_is_compiled(sShaderDemo5) )
-{shader_set(sShaderDemo5);
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Draw Guard Distance
 
- // 1,1,1 = PURE white (each channel is 0 to 1)
- shader_set_uniform_f(colour_to_find, 1, 0, 1);       
-
- // 1,0,0 = red
- shader_set_uniform_f(colour_to_set, 0, 0, 1);
- 
- draw_sprite(sprite_index,image_index,x, y);   
- shader_reset();}
- 
-*/
+draw_set_colour(c_white);
+draw_set_alpha(0.2);
+draw_circle(x, y, guardDistance, true);
+draw_set_alpha(0.1);
+draw_circle(x, y, guardDistance, false);
+draw_set_alpha(1);
+draw_set_colour(c_black);
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Color Swap Shader - good?
 
 if( shader_is_compiled(shColorReplaceBlend) )
-{
-
-shader_set(shColorReplaceBlend);
+{shader_set(shColorReplaceBlend);
 
  // 1,1,1,1 = PURE white (each RGBA channel is 0 to 1)
- shader_set_uniform_f(colorIn, 0, 1, 0, 1);       
- shader_set_uniform_f(colorOut, 1, 0, 0, 1);
+ shader_set_uniform_f(colorIn, 0, 1, 0, 1);
+ shader_set_uniform_f(colorOut, color_get_red(color) / 256, color_get_green(color) / 256, color_get_blue(color) / 256, 1);
  shader_set_uniform_f(colorTolerance, 0.1, 0.1, 1, 1); 
  shader_set_uniform_f(blend, 1); 
 
- draw_sprite(sprite_index, image_index, x, y);   
- shader_reset();}
+ draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);}
+shader_reset();
 </string>
           </argument>
         </arguments>

@@ -36,10 +36,17 @@ selectMode = -1;
 buildingSelected = noone;
 mobSelected = noone;
 spriteSelected = noone;
+rh = noone; // roundhouse
 
 // Resources
-money = 500;
+money = 5000;
 coal = 500;
+
+// Rolling Stock limits
+carCapacity = 0;
+carsInUse = 0;
+engineCapacity = 2;
+engines = 0;
 
 // Time
 paused = false;
@@ -48,20 +55,34 @@ minuteLength = 1000000; // in microseconds
 time = 0;
 minute = 0;
 hour = 0;
-day = 0;
-year = 0;
+day = 1;
+year = 1;
 
 // Station Panel
 panelStation.uiVisible = false;
 autoStationPanel = true;
 
-carCapacity = 0;
-carsInUse = 0;
-
 // resource alerts
-flashMoney = false;
-flashCoal = false;
-flashCars = false;
+flashMoney = -1;
+flashCoal = -1;
+flashCars = -1;
+flashCars = -1;
+
+// Tutorial
+tutorial = -1;
+
+// Players
+players = 2;
+playerColor[0] = make_colour_hsv(0, 3 * 255 / 4, 7 * 255 / 8); // The Player is Red.
+playerColor[1] = make_colour_hsv(42, 3 * 255 / 4, 7 * 255 / 8); // The Computer is Yellow.
+team0 = ds_priority_create();
+team1 = ds_priority_create();
+
+units = ds_grid_create(players, 2);
+ds_grid_clear(units, 0);
+
+with (ui_button)
+{color = control.playerColor[0];}
 
 // temporary &amp; testing
 alarm_set(1, room_speed * (irandom(15) + 5));
@@ -85,38 +106,87 @@ alarm_set(1, room_speed * (irandom(15) + 5));
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Create Homebase
+            <string>/// Modules
+/*
+// Trade
+tradeMod = ds_grid_create(2, 12); // level, name
+ds_grid_clear(tradeMod, -1);
 
-if room == roomHome
-{
+// Mining
+miningMod = ds_grid_create(11, 11);
+ds_grid_clear(miningMod, -1);
+var m = 0;
 
-}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>/// Away Mission Setup
+    // Weak Battery
+    ds_grid_set(miningMod, m, 0, 0); // level
+    ds_grid_set(miningMod, m, 1, "Mining Boost"); // name
+    ds_grid_set(miningMod, m, 2, 0); // blueprint type
+    ds_grid_set(miningMod, m, 3, 0); // number of blueprints held (separate array for blueprint requirements?)
+    ds_grid_set(miningMod, m, 4, 2000); // unlock price
+    ds_grid_set(miningMod, m, 5, 5); // research time (mins)
+    ds_grid_set(miningMod, m, 6, 2500); // install price
+    ds_grid_set(miningMod, m, 7, 5); // coal use -&gt; activation cost
+    ds_grid_set(miningMod, m, 8, 10); // duration (mins)
+    ds_grid_set(miningMod, m, 9, 20); // cooldown (mins)
+    ds_grid_set(miningMod, m, 10, 2); // effect magnitude (multiplier in this case)
+    w++;
 
-if room == roomAway
-{
 
-}
+// Weapons
+weaponMod = ds_grid_create(11, 7); // level, name, blueprint type, number of blueprints (separate array for blueprint requirements?), unlock prince, research time, install price, coal use, range, damage, ROF
+ds_grid_clear(weaponMod, -1);
+var w = 0;
+
+    // Weak Battery
+    ds_grid_set(weaponMod, w, 0, 1); // level
+    ds_grid_set(weaponMod, w, 1, "Weak Battery"); // name
+    ds_grid_set(weaponMod, w, 2, 1); // blueprint type
+    ds_grid_set(weaponMod, w, 3, 0); // number of blueprints held (separate array for blueprint requirements?)
+    ds_grid_set(weaponMod, w, 4, 0); // unlock prince
+    ds_grid_set(weaponMod, w, 5, 0); // research time
+    ds_grid_set(weaponMod, w, 6, 0); // install price
+    ds_grid_set(weaponMod, w, 7, 0); // coal use
+    ds_grid_set(weaponMod, w, 8, 120); // range
+    ds_grid_set(weaponMod, w, 9, 15); // damage
+    ds_grid_set(weaponMod, w, 10, 200); // ROF - steps til reloaded
+    w++;
+    
+    // Sentinel Battery
+    ds_grid_set(weaponMod, w, 0, 1); // level, name, blueprint type, number of blueprints (separate array for blueprint requirements?), unlock prince, research time, install price, coal use, range, damage, ROF
+    ds_grid_set(weaponMod, w, 1, "Sentinel Battery"); // name, blueprint type, number of blueprints (separate array for blueprint requirements?), unlock prince, research time, install price, coal use, range, damage, ROF
+    ds_grid_set(weaponMod, w, 2, 1); // blueprint type
+    ds_grid_set(weaponMod, w, 3, 0); // number of blueprints held (separate array for blueprint requirements?)
+    ds_grid_set(weaponMod, w, 4, 0); // unlock prince
+    ds_grid_set(weaponMod, w, 5, 0); // research time
+    ds_grid_set(weaponMod, w, 6, 0); // install price
+    ds_grid_set(weaponMod, w, 7, 0); // coal use
+    ds_grid_set(weaponMod, w, 8, 150); // range
+    ds_grid_set(weaponMod, w, 9, 35); // damage
+    ds_grid_set(weaponMod, w, 10, 300); // ROF - steps til reloaded
+    w++;
+    
+    // Musket Squad
+    ds_grid_set(weaponMod, w, 0, 1); // level, name, blueprint type, number of blueprints (separate array for blueprint requirements?), unlock prince, research time, install price, coal use, range, damage, ROF
+    ds_grid_set(weaponMod, w, 1, "Rifled Musket"); // name, blueprint type, number of blueprints (separate array for blueprint requirements?), unlock prince, research time, install price, coal use, range, damage, ROF
+    ds_grid_set(weaponMod, w, 2, 1); // blueprint type
+    ds_grid_set(weaponMod, w, 3, 0); // number of blueprints held (separate array for blueprint requirements?)
+    ds_grid_set(weaponMod, w, 4, 0); // unlock prince
+    ds_grid_set(weaponMod, w, 5, 0); // research time
+    ds_grid_set(weaponMod, w, 6, 0); // install price
+    ds_grid_set(weaponMod, w, 7, 0); // coal use
+    ds_grid_set(weaponMod, w, 8, 40); // range
+    ds_grid_set(weaponMod, w, 9, 5); // damage
+    ds_grid_set(weaponMod, w, 10, 150); // ROF - steps til reloaded
+    w++;
+
+
+// Armor
+armorMod = ds_grid_create(2, 8);
+ds_grid_clear(armorMod, -1);
+
+// Support
+supportMod = ds_grid_create(2, 26);
+ds_grid_clear(supportMod, -1);
 </string>
           </argument>
         </arguments>
@@ -145,12 +215,11 @@ heightMap = ds_grid_create(slices, slices);
 hm = heightMap;
 
 while (floor(maxHeight) &gt; 6) // the exponent = how many iterations
-{for (var a = 0; a &lt;= ds_grid_width(hm) - 1; a += 2)
- {for (var b = 0; b &lt;= ds_grid_height(hm) - 1; b += 2)
+{for (var a = 0; a &lt; ds_grid_width(hm); a += 2)
+ {for (var b = 0; b &lt; ds_grid_height(hm); b += 2)
   {if (slices == 1)
    {// first iteration, no comparison possible
-    ds_grid_set(hm, a, b, irandom(maxHeight * 2));
-   }
+    ds_grid_set(hm, a, b, irandom(maxHeight * 2));}
    else
    {// following iterations, compare and adjust
     var sum, count, checkAbove, checkBelow, checkLeft, checkRight, add;
@@ -195,15 +264,11 @@ while (floor(maxHeight) &gt; 6) // the exponent = how many iterations
      
     var avg = sum / count;
     ds_grid_set(hm, a, b, round(avg + irandom(maxHeight)));
-      
    }
- 
   }
  }
- 
-/* show_debug_message("slice " + slices);
-  
-var line = "["
+   
+/*var line = "["
  for (var c = 0; c &lt; ds_grid_width(hm); c++)
  {for (var d = 0; d &lt; ds_grid_height(hm); d++)
   {line += " " + ds_grid_get(hm, c, d);
@@ -212,7 +277,6 @@ var line = "["
   show_debug_message(line + " ]");
   line = "[";}*/
  
- 
  // cut the slices &amp; height change in half before you start again
  slices *= 2;
  maxHeight /= 2;
@@ -220,7 +284,7 @@ var line = "["
  // double the grid size
  var cc = ds_grid_width(hm);
  var dd = ds_grid_height(hm);
- ds_grid_resize(hm , cc + slices, dd + slices);
+ ds_grid_resize(hm, (cc * 2) + 1, (dd * 2) + 1);
  
  // space out the data to every other row
  for (var c = cc - 1; c &gt;= 0; c--)
@@ -291,7 +355,7 @@ for (var a = 0; a &lt; ds_grid_width(hm); a++)
     var avg = sum / count;
     ds_grid_set(hm, a, b, round(avg + irandom(maxHeight)));}}
     
-/*show_debug_message("INITIAL");
+/*show_debug_message("INITIAL - " + ds_grid_width(hm) + "x" + ds_grid_height(hm));
   
 var line = "["
  for (var c = 0; c &lt; ds_grid_height(hm); c++)
@@ -574,8 +638,6 @@ for (var xx = 0; xx &lt; hmW; xx++)
             <kind>1</kind>
             <string>/// River generation
 
-//disabled for now while i fix low-lying waters not on the coast.
-
 var hmW = ds_grid_width(hm);
 var hmH = ds_grid_height(hm); 
 
@@ -755,91 +817,6 @@ for (var tx = 0; tx &lt; hmW; tx++)
     {if random(1) &lt;= ((abs(ds_grid_get(hm, xx, yy)) - minH) / (maxH - minH)) - .25 // make it less likely to fill in forests
      {ds_grid_add(tm, tx, ty, 1);}
      count--;}}}}}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>/// Sprite generation
-
-var hmmin, hmmax, right, bottom;
-right = ds_grid_width(hm) - 1;
-bottom = ds_grid_height(hm) - 1;
-
-var a = 1;
-while (2 ^ a &lt; right)
-{a++;}
-right = 2 ^ a;
-
-var b = 1;
-while (2 ^ b &lt; bottom)
-{b++;}
-bottom = 2 ^ b;
-
-heightSurface = surface_create(right, bottom);
-waterSurface = surface_create(right, bottom);
-treeSurface = surface_create(right, bottom);
-//It is highly recommended that all surfaces be created with a size that is a power of 2, ie: 16, 128, 512 or 1024 pixels in size, for example. This is not exactly necessary on certain platforms (like Windows and MacOS) but it will certainly increase compatibility on those targets, while for HTML5 and devices it is essential and very it's important that you remember this or you may run into problems later. 
-
-right = ds_grid_width(hm) - 1;
-bottom = ds_grid_height(hm) - 1;
-
-// heightmap
-surface_set_target(heightSurface);
-hmmin = ds_grid_get_min(hm, 0, 0, right, bottom);
-ds_grid_add_region(hm, 0, 0, right, bottom, -hmmin); // min value now should be 0.
-hmmax = ds_grid_get_max(hm, 0, 0, right, bottom);
-
-for (var c = 0; c &lt; ds_grid_width(hm); c++)
-{for (var d = 0; d &lt; ds_grid_height(hm); d++)
- {draw_set_color(make_colour_hsv(0, 0, 255 * ds_grid_get(hm, c, d) / hmmax));
-  draw_point(c, d);}}
-  
-// watermap
-surface_reset_target();
-surface_set_target(waterSurface);
-
-for (var c = 0; c &lt;= right; c++)
-{for (var d = 0; d &lt;= bottom; d++)
- {draw_set_color(c_blue);
-  if ds_grid_get(wm, c, d) &gt; 0
-  {draw_point(c, d);}}}
-  
-// treemap
-surface_reset_target();
-surface_set_target(treeSurface);
-
-for (var c = 0; c &lt;= right; c++)
-{for (var d = 0; d &lt;= bottom; d++)
- {draw_set_color(c_green);
-  if ds_grid_get(tm, c, d) &gt; 0
-  {draw_point(c, d);}}}
-  
-surface_reset_target();
-
-// make the sprites
-sprite_add_from_surface(spriteMap, heightSurface, 0, 0, surface_get_width(heightSurface), surface_get_height(heightSurface), false, false);
-sprite_add_from_surface(spriteMap, waterSurface, 0, 0, surface_get_width(waterSurface), surface_get_height(waterSurface), false, false);
-sprite_add_from_surface(spriteMap, treeSurface, 0, 0, surface_get_width(treeSurface), surface_get_height(treeSurface), false, false);
-
-surface_free(heightSurface);
-surface_free(waterSurface);
-surface_free(treeSurface);
 </string>
           </argument>
         </arguments>
@@ -1439,6 +1416,273 @@ wolf
           </argument>
         </arguments>
       </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Home Base Setup
+
+if room == roomHome
+{var sOne, sTwo, sOneX, sOneY, sTwoX, sTwoY, sDist;
+
+ var right = ds_grid_width(hm) - 1;
+ var bottom = ds_grid_height(hm) - 1;
+
+ do
+ {// Place two stations, at least 1/2 the map between them.
+  sOne = true;
+  sTwo = true;
+  
+  sOneX = irandom(right - 1);
+  sOneY = irandom(bottom - 1);
+  sTwoX = irandom(right - 1);
+  sTwoY = irandom(bottom - 1);
+  
+  // Are the stations far enough apart?
+  sDist = point_distance(sOneX, sOneY, sTwoX, sTwoY);
+  if (sDist &lt; point_distance(0, 0, right, bottom) / 2)
+  {sOne = false; sTwo = false;}
+  
+  // Are the stations far enough from water?
+  if ds_grid_get_max(wm, max(0, sOneX - 1), max(0, sOneY - 1), min(right, sOneX + 1), min(bottom, sOneY + 1)) &gt; 0
+  {sOne = false;}
+  if ds_grid_get_max(wm, max(0, sTwoX - 1), max(0, sTwoY - 1), min(right, sTwoX + 1), min(bottom, sTwoY + 1)) &gt; 0
+  {sTwo = false;}}
+ until (sOne and sTwo)
+ 
+ // Create stations
+ 
+ // Clear trees
+ ds_grid_set(tm, sOneX, sOneY, 0);
+ ds_grid_set(tm, sTwoX, sTwoY, 0);
+
+ var a = instance_create((sOneX - .5) * grid, (sOneY - .5) * grid, objectStation);
+ var b = instance_create((sTwoX - .5) * grid, (sTwoY - .5) * grid, objectStation);
+ 
+ nameList = 0;
+ a.name = ds_list_find_value(prefixes, nameList) + ds_list_find_value(suffixes, nameList);
+ a.name = string_upper(string_char_at(a.name, 1)) + string_delete(a.name, 1, 1);
+ nameList++;
+ b.name = ds_list_find_value(prefixes, nameList) + ds_list_find_value(suffixes, nameList);
+ b.name = string_upper(string_char_at(b.name, 1)) + string_delete(b.name, 1, 1);
+ 
+ a.owner = 0;
+ b.owner = 1;
+ b.level = 3;
+ 
+ // Mine time
+ var mine;
+ 
+ do
+ {mine = true;
+ 
+  mX = irandom(right - 1);
+  mY = irandom(bottom - 1);
+  
+  // Is the Mine close enough to our station?
+  sDist = point_distance(sOneX, sOneY, mX, mY);
+  if (sDist &gt; point_distance(0, 0, right, bottom) / 4)
+  {mine = false;}
+  if (sDist &lt; 4)
+  {mine = false;}
+ 
+  // Is the Mine far enough from their station?
+  sDist = point_distance(sTwoX, sTwoY, mX, mY);
+  if (sDist &lt; point_distance(0, 0, right, bottom) / 2)
+  {mine = false;}
+
+  // Is the mine far enough from water?
+  if ds_grid_get_max(wm, max(0, mX - 1), max(0, mY - 1), min(right, mX + 1), min(bottom, mY + 1)) &gt; 0
+  {mine = false;}}
+ until (mine)
+ 
+ // Create Mine
+ ds_grid_set(tm, mX, mY, 0);
+ var c = instance_create((mX - .5) * grid, (mY - .5) * grid, objectCoalMine);
+ 
+ c.name = a.name + " Mines";
+ c.owner = 0;
+ 
+ // Guard Posts
+ var coverageMap = ds_grid_create(right + 1, bottom +1);
+ var cm = coverageMap;
+ ds_grid_clear(cm, 0);
+ 
+ for (var d = 0; d &lt; instance_number(objectStation); d++)
+ {var ds = instance_find(objectStation, d);
+  var dx = ceil(ds.x / grid);
+  var dy = ceil(ds.y / grid);
+  ds_grid_set_disk(cm, dx, dy, 6, 1);}
+
+ for (var d = 0; d &lt; instance_number(objectCoalMine); d++)
+ {var ds = instance_find(objectCoalMine, d);
+  var dx = ceil(ds.x / grid);
+  var dy = ceil(ds.y / grid);
+  ds_grid_set_disk(cm, dx, dy, 6, 1);} 
+ 
+ var landTotal =  ds_grid_height(cm) * ds_grid_width(cm);
+ var landCovered = ds_grid_get_sum(cm, 0, 0, right, bottom);
+
+ // make some Guardposts
+ while (instance_number(objectGuardPost) &lt; 3)
+ {repeat (25)
+  {repeat (100)
+   {g = irandom(right);
+    h = irandom(bottom);
+    if (ds_grid_get_disk_max(cm, g, h, 4) &lt; 1)
+    {if (ds_grid_get(wm, g, h) &lt; 1)
+     {var i = instance_create((g + .5) * grid, (h + .5) * grid, objectGuardPost);
+      i.owner = noone;
+      ds_grid_set_disk(cm, g, h, 6, 1);}}}}}
+
+ // Set up the guardposts   
+ with (objectGuardPost)
+ {var sn = instance_nearest(x, y, objectStation);
+  var mn = instance_nearest(x, y, objectCoalMine);
+  
+  if point_distance(x, y, sn.x, sn.y) &lt;= point_distance(x, y, mn.x, mn.y)
+  {if sn.owner &gt; 0
+   {owner = sn.owner}}
+  else
+  {if mn.owner &gt; 0
+   {owner = mn.owner}}}
+
+ with (parentGuarded)
+ {ds_priority_add(control.team0, id, 0);
+  ds_priority_add(control.team1, id, 0);}
+  
+ scriptStrategize();
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Away Mission Setup
+
+if room == roomAway
+{
+
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Sprite generation
+
+var hmmin, hmmax, right, bottom;
+right = ds_grid_width(hm) - 1;
+bottom = ds_grid_height(hm) - 1;
+
+var a = 1;
+while (power(2, a) &lt; right)
+{a++;}
+right = power(2, a);
+
+var b = 1;
+while (power(2, b) &lt; bottom)
+{b++;}
+ bottom = power(2, b);
+
+heightSurface = surface_create(right, bottom);
+waterSurface = surface_create(right, bottom);
+treeSurface = surface_create(right, bottom);
+//It is highly recommended that all surfaces be created with a size that is a power of 2, ie: 16, 128, 512 or 1024 pixels in size, for example. This is not exactly necessary on certain platforms (like Windows and MacOS) but it will certainly increase compatibility on those targets, while for HTML5 and devices it is essential and very it's important that you remember this or you may run into problems later. 
+
+right = ds_grid_width(hm) - 1;
+bottom = ds_grid_height(hm) - 1;
+
+// heightmap
+surface_set_target(heightSurface);
+hmmin = ds_grid_get_min(hm, 0, 0, right, bottom);
+ds_grid_add_region(hm, 0, 0, right, bottom, -hmmin); // min value now should be 0.
+hmmax = ds_grid_get_max(hm, 0, 0, right, bottom);
+
+for (var c = 0; c &lt;= right; c++)
+{for (var d = 0; d &lt;= bottom; d++)
+ {draw_set_color(make_colour_hsv(0, 0, 256 * (ds_grid_get(hm, c, d) / hmmax)));
+  draw_point(c, d);}}
+  
+// watermap
+surface_reset_target();
+surface_set_target(waterSurface);
+
+for (var c = 0; c &lt;= right; c++)
+{for (var d = 0; d &lt;= bottom; d++)
+ {draw_set_color(c_blue);
+  if ds_grid_get(wm, c, d) &gt; 0
+  {draw_point(c, d);}}}
+  
+// treemap
+surface_reset_target();
+surface_set_target(treeSurface);
+
+for (var c = 0; c &lt;= right; c++)
+{for (var d = 0; d &lt;= bottom; d++)
+ {draw_set_color(make_colour_hsv(63, 255, 63));
+  if ds_grid_get(tm, c, d) &gt; 0
+  {draw_point(c, d);}}}
+  
+surface_reset_target();
+
+// make the sprites
+sprite_add_from_surface(spriteMap, heightSurface, 0, 0, right + 1, bottom + 1, false, false);
+sprite_add_from_surface(spriteMap, waterSurface, 0, 0, right + 1, bottom + 1, false, false);
+sprite_add_from_surface(spriteMap, treeSurface, 0, 0, right + 1, bottom + 1, false, false);
+
+surface_free(heightSurface);
+surface_free(waterSurface);
+surface_free(treeSurface);
+
+draw_set_colour(c_white);
+image_blend = c_white;
+</string>
+          </argument>
+        </arguments>
+      </action>
     </event>
     <event eventtype="1" enumb="0">
       <action>
@@ -1465,6 +1709,16 @@ ds_grid_destroy(waterMap);
 ds_grid_destroy(wm);
 ds_grid_destroy(treeMap);
 ds_grid_destroy(tm);
+ds_grid_destroy(coverageMap);
+ds_grid_destroy(cm);
+ds_grid_destroy(units);
+ds_priority_destroy(team0);
+ds_priority_destroy(team1);
+
+ds_list_destroy(prefixes);
+ds_list_destroy(suffixes);
+
+mp_grid_destroy(mpGrid);
 </string>
           </argument>
         </arguments>
@@ -1512,8 +1766,10 @@ ds_grid_destroy(tm);
             <kind>1</kind>
             <string>/// spawn an enemy for target practice!
 
-if instance_number(objectEnemy) &lt; 5
-{instance_create(irandom(room_width), irandom(room_height), objectEnemy);}
+/*
+if instance_number(parentEnemyMob) &lt; 5
+{a = instance_create(irandom(room_width), irandom(room_height), objectCannon);
+ a.owner = 1;}
 
 alarm_set(1, room_speed * (irandom(15) + 5));
 </string>
@@ -1607,13 +1863,25 @@ x = view_xview[0] + 64;
 y = view_yview[0] + 64;
 
 if (room == roomHome)
-{with (panelBuildings)
+{with (panelGameStart)
+ {x = view_xview[0] + ((view_wview[0] - 304) / 2);
+  y = view_yview[0] + ((view_hview[0] - 112) / 2);}
+  
+ with (panelTutorial)
+ {x = view_xview[0] + 64;
+  y = view_yview[0] + 64;}
+  
+ with (panelBuildings)
  {x = view_xview[0];
   y = view_yview[0] + 336;}
  
  with (panelStation)
  {x = view_xview[0] + 64;
-  y = view_yview[0] + 64;}}
+  y = view_yview[0] + 64;}
+  
+ with (panelBuildEngine)
+ {x = view_xview[0];
+  y = view_yview[0] + 432;}}
 </string>
           </argument>
         </arguments>
@@ -1682,40 +1950,50 @@ carsFC = 8;
 if !paused
 {time += (delta_time * timeFactor);
 
-while (time &gt;= minuteLength)
-{time -= minuteLength;
- minute += 5;}
-while (minute &gt;= 60)
-{minute -= 60;
- hour++;}
-while (hour &gt;= 24)
-{hour -= 24;
- day++;
- coal += instance_number(objectStation) * 8; // hydrogen drip of level 1 desert and fire planets, hardcoded for now.  Make a script to handle eventually.
+ while (time &gt;= minuteLength)
+ {time -= minuteLength;
+  minute += 5;
+
+  // how many units owned by whom?
+  ds_grid_clear(units, 0);
+  for (var a = 0; a &lt; instance_number(parentMob); a++)
+  {var b = instance_find(parentMob, a);
+   var bo = b.owner;
+   ds_grid_add(units, bo, 0, 1);}
+    
+  // unit caps    
+  for (var a = 0; a &lt; instance_number(parentGuarded); a++)
+  {var b = instance_find(parentGuarded, a);
+   var bo = b.owner;
+   var bl = b.level;
+   if (bo &gt;= 0)
+   {ds_grid_add(units, bo, 1, bl);}}
+
+  // check for control, spawning
+  with(parentGuarded) {event_user(14);}
+  
+  scriptStrategize();
  }
-while (day &gt;= 360)
-{day -= 360;
- year++;}
+ while (minute &gt;= 60)
+ {minute -= 60;
+  hour++;}
+ while (hour &gt;= 24)
+ {hour -= 24;
+  day++;
+  coal += instance_number(objectStation) * 8; // hydrogen drip of level 1 desert and fire planets, hardcoded for now.  Make a script to handle eventually.
+  with (objectCoalMine) {event_user(1);} // Coal Mine's event 1 = discover new veins
+  }
+ while (day &gt;= 360)
+ {day -= 360;
+  year++;}
 }
+
+
+
+
 </string>
           </argument>
         </arguments>
-      </action>
-    </event>
-    <event eventtype="5" enumb="8">
-      <action>
-        <libid>1</libid>
-        <id>223</id>
-        <kind>0</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>0</useapplyto>
-        <exetype>1</exetype>
-        <functionname>action_current_room</functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
       </action>
     </event>
     <event eventtype="6" enumb="51">
@@ -1742,17 +2020,25 @@ if (room == roomHome)
 // clicked outside station panel, close.
 if (panelStation.uiVisible)
 {if (!collision_point(mouse_x, mouse_y, panelStation, false, false))
- {panelStation.uiVisible = false;}}
+ {scriptDeselect();}}
 
 switch (selectMode)
 {case 2: // Move train
- {with (mobSelected)
+ {    show_debug_message("so i know about a mob named " + mobSelected);
+  with (mobSelected)
   {if (goal == noone)
-   {goal = instance_nearest(mouse_x, mouse_y, parentPlatform);
+   {var g = instance_nearest(mouse_x, mouse_y, parentGuarded);
+    var p = instance_nearest(mouse_x, mouse_y, parentPlatform);
+    
+    if point_distance(mouse_x, mouse_y, g.x, g.y) &lt; point_distance(mouse_x, mouse_y, p.x, p.y)
+    {goal = instance_nearest(g.x, g.y, objectTrack);}
+    else
+    {goal = instance_nearest(mouse_x, mouse_y, parentPlatform);}
+
     var a, b, gx, gy;
     a = path_add();
-    gx = goal.x + grid;
-    gy = goal.y + grid;
+    gx = goal.x;
+    gy = goal.y;
     mp_grid_path(other.mpGrid, a, x, y, gx, gy, false);
     b = path_get_length(a);
 //    other.coal -= fuel * b / grid;
@@ -1796,16 +2082,22 @@ switch (selectMode)
 {case 0: // Lay tracks &amp; place building
  {if !collision_point(mouse_x, mouse_y, panelBuildings, false, true)
   {if !collision_point(mouse_x, mouse_y, parentBuilding, false, true)
-   {var a = instance_create(floor(.5 * mouse_x / grid) * grid * 2, floor(.5 * mouse_y / grid) * grid * 2, buildingSelected);
+   {var a = instance_create(grid + floor(.5 * mouse_x / grid) * grid * 2, grid + floor(.5 * mouse_y / grid) * grid * 2, buildingSelected);
+    show_debug_message("so i know about an instance named " + a + " and also a building named " + buildingSelected);
+    a.owner = 0;
     with (parentTrack)
     {event_user(0);}
     if (buildingSelected != objectTrack)
-    {scriptDeselect();}}}}
+    {scriptDeselect();
+     if (buildingSelected == objectRoundhouse)
+     {rh = a;}}}}}
  break;
  case 1: // Place Engine
  {if !collision_point(mouse_x, mouse_y, panelBuildings, false, true)
   {if collision_point(mouse_x, mouse_y, objectTrack, false, true)
    {var a = instance_create(grid + floor(.5 * mouse_x / grid) * grid * 2, grid + floor(.5 * mouse_y / grid) * grid * 2, buildingSelected);
+       show_debug_message("so i know about an instance named " + a + " and also a building named " + buildingSelected);
+    a.owner = 0;
     scriptDeselect();}}}
  break;
  default:
@@ -1853,6 +2145,21 @@ else
             <kind>1</kind>
             <string>/// UI Actions
 
+// Game Start
+
+if other.uiControlName=='TutorialNo'
+{panelGameStart.uiVisible = false;
+ tutorial = 0;}
+if other.uiControlName=='TutorialYes'
+{panelGameStart.uiVisible = false;
+ tutorial = 1;
+ panelTutorial.uiVisible = true;}
+ 
+// Tutorial
+
+if other.uiControlName=='CloseTutorial'
+{panelTutorial.uiVisible = false;} 
+ 
 // Ferry
 
 if other.uiControlName=='FerryAway'
@@ -1869,11 +2176,11 @@ if other.uiControlName=='Rail'
  buildingSelected = objectTrack;
  spriteSelected = object_get_sprite(buildingSelected);
  selectMode = 0;}
-if other.uiControlName=='Train'
+if other.uiControlName=='Roundhouse'
 {scriptDeselect();
- buildingSelected = objectTransport;
+ buildingSelected = objectRoundhouse;
  spriteSelected = object_get_sprite(buildingSelected);
- selectMode = 1;}
+ selectMode = 0;}
 if other.uiControlName=='Yard'
 {scriptDeselect();
  buildingSelected = objectYard;
@@ -1890,7 +2197,28 @@ if other.uiControlName=='Ferry'
  spriteSelected = object_get_sprite(buildingSelected);
  selectMode = 0;}
 
-  
+// Build Engine Panel
+if other.uiControlName=='Transport'
+{if (instance_number(parentEngine) &lt; engineCapacity)
+ {if (money &gt;= 250)
+  {money -= 250;
+   var a = instance_create(rh.x, rh.y, objectTransport);
+   a.owner = 0;}}
+ scriptDeselect();}
+if other.uiControlName=='Miner'
+{if (instance_number(parentEngine) &lt; engineCapacity)
+ {if (money &gt;= 500)
+  {money -= 500;
+   var a = instance_create(rh.x, rh.y, objectMiner);
+   a.owner = 0;}}
+ scriptDeselect();}
+if other.uiControlName=='Wartrain'
+{if (instance_number(parentEngine) &lt; engineCapacity)
+ {if (money &gt;= 750)
+  {money -= 750;
+   var a = instance_create(rh.x, rh.y, objectWartrain);
+   a.owner = 0;}}
+ scriptDeselect();}
  
  //next select mode is 3 or more.
    
@@ -1956,9 +2284,11 @@ if room == roomHome
 grid = 16; 
 
 // mp_grid
+var hmW = ds_grid_width(hm) * grid * 2;
+var hmH = ds_grid_height(hm) * grid * 2; 
  
-mpGrid = mp_grid_create(-grid / 2, -grid / 2, (room_width + grid) / grid, (room_height + grid) / grid, grid, grid);
-mp_grid_add_rectangle(mpGrid, 0, 0, room_width, room_height);
+mpGrid = mp_grid_create(-grid / 2, -grid / 2, (hmW + grid) / grid, (hmH + grid) / grid, grid, grid);
+mp_grid_add_rectangle(mpGrid, 0, 0, hmW, hmH);
 
 }/*
 // Make every cell where both coordinates are even impassable.
@@ -2134,8 +2464,8 @@ if (instance_number(parentBuilding) &gt; 0)
   else
   {dist++;}}
  
- x = sx * grid;
- y = sy * grid;
+ x = sx * grid + (grid / 2);
+ y = sy * grid + (grid / 2);
  
  grid /= 2;
 }}
@@ -2160,7 +2490,7 @@ if (instance_number(parentBuilding) &gt; 0)
           <argument>
             <kind>1</kind>
             <string>/// shaders?
-show_debug_message("shaders? - " + shaders_are_supported());
+//show_debug_message("shaders? - " + shaders_are_supported());
 </string>
           </argument>
         </arguments>
@@ -2191,6 +2521,16 @@ ds_grid_destroy(waterMap);
 ds_grid_destroy(wm);
 ds_grid_destroy(treeMap);
 ds_grid_destroy(tm);
+ds_grid_destroy(coverageMap);
+ds_grid_destroy(cm);
+ds_grid_destroy(units);
+ds_priority_destroy(team0);
+ds_priority_destroy(team1);
+
+ds_list_destroy(prefixes);
+ds_list_destroy(suffixes);
+
+mp_grid_destroy(mpGrid);
 </string>
           </argument>
         </arguments>
@@ -2220,28 +2560,25 @@ draw_set_alpha(1);
 draw_set_font(fontArialBlack12);
 draw_set_valign(fa_top);
 
+// Left
+draw_set_halign(fa_left);
+
+draw_set_colour(c_gray);
+draw_text(8, 8, string(instance_number(parentEngine)) + " / " + string(engineCapacity) + " engines");
+
+draw_set_colour(c_dkgray);
+draw_text(8, 24, string(carsInUse) + " / " + string(carCapacity) + " cars");
+
+// Right
 draw_set_halign(fa_right);
+
 draw_set_colour(c_green);
 draw_text(view_wview[0] - 8, 8, "¤" + string(round(money))); // or maybe £
 
 draw_set_colour(c_black);
 draw_text(view_wview[0] - 8, 24, string(round(coal)) + "t C");
 
-draw_set_colour(c_dkgray);
-draw_text(view_wview[0] - 8, 40, string(round(carsInUse)) + " / " + string(round(carCapacity)) + " cars");
 
-/*
-draw_set_halign(fa_left);
-draw_set_colour(c_white);
-draw_text(8, 8, string(instance_number(objectHuman)) + " / " + string(maxPopulation) + " Pop")
-draw_set_colour(c_green);
-draw_text(8, 24, string(food) + " Food");
-
-draw_set_halign(fa_right);
-draw_set_colour(c_silver);
-draw_text(view_wview[0] - 8, 8, string(metal) + " M")
-draw_set_colour(c_teal);
-draw_text(view_wview[0] - 8, 24, string(hydrocarbons) + " HC");
 </string>
           </argument>
         </arguments>
@@ -2303,16 +2640,75 @@ draw_set_halign(fa_center);
 draw_set_colour(c_black);
 
 if minute &lt; 10
-{draw_text(view_wview[0] / 2, view_hview[0] - 32, string(hour) + ":0" + string(floor(minute)));}
+{draw_text(view_wview[0] / 2, view_hview[0] - 32, "Day " + string(day) + ", Year " + string(year) + "#" + string(hour) + ":0" + string(floor(minute)));}
 else
-{draw_text(view_wview[0] / 2, view_hview[0] - 32, string(hour) + ":" + string(floor(minute)));}
-
+{draw_text(view_wview[0] / 2, view_hview[0] - 32, "Day " + string(day) + ", Year " + string(year) + "#" + string(hour) + ":" + string(floor(minute)));}
 </string>
           </argument>
         </arguments>
       </action>
     </event>
     <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// draw map
+
+texture_set_interpolation(false);
+draw_sprite_ext(spriteMap, 0, 0, 0, grid * 2, grid * 2, image_angle, make_colour_hsv(92, 127, 255), 1);
+draw_sprite_ext(spriteMap, 1, 0, 0, grid * 2, grid * 2, image_angle, image_blend, .75);
+draw_sprite_ext(spriteMap, 2, 0, 0, grid * 2, grid * 2, image_angle, image_blend, .75);
+texture_set_interpolation(true);
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// grid stuff - coords etc
+
+draw_set_alpha(1);
+draw_set_font(fontArialBlack12);
+draw_set_valign(fa_top);
+
+draw_set_halign(fa_left);
+draw_set_colour(c_black);
+draw_text(mouse_x, mouse_y + 16, string(floor(mouse_x / (grid * 2))) + ", " + string(floor(mouse_y / (grid * 2))));
+/*
+draw_set_alpha(0.3);
+mp_grid_draw(mpGrid);
+draw_set_alpha(1);
+</string>
+          </argument>
+        </arguments>
+      </action>
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -2384,65 +2780,6 @@ if selectMode == 1
 if selectMode == 2
 {if buildingSelected != noone
  {draw_sprite(spriteSelected, 0, buildingSelected.x, buildingSelected.y);}}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>/// draw map
-
-texture_set_interpolation(false);
-draw_sprite_ext(spriteMap, 0, 0, 0, grid * 2, grid * 2, image_angle, image_blend, 1);
-draw_sprite_ext(spriteMap, 1, 0, 0, grid * 2, grid * 2, image_angle, image_blend, 0.6);
-draw_sprite_ext(spriteMap, 2, 0, 0, grid * 2, grid * 2, image_angle, image_blend, 0.6);
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>/// grid stuff - coords etc
-/*
-draw_set_alpha(1);
-draw_set_font(fontArialBlack12);
-draw_set_valign(fa_top);
-
-draw_set_halign(fa_left);
-draw_set_colour(c_black);
-draw_text(mouse_x, mouse_y + 16, string(floor(mouse_x)) + ", " + string(floor(mouse_y)));
-
-draw_set_alpha(0.3);
-mp_grid_draw(mpGrid);
-draw_set_alpha(1);
 </string>
           </argument>
         </arguments>

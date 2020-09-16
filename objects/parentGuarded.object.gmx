@@ -32,6 +32,232 @@ event_inherited();
           </argument>
         </arguments>
       </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Setup
+
+localControl = ds_grid_create(1, control.players);
+ds_grid_clear(localControl, 0);
+
+level = 0;
+maxSpawn = 60;
+spawn = maxSpawn;
+
+guards = ds_list_create();
+
+event_user(14);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="1" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Cleanup
+
+ds_grid_destroy(localControl);
+ds_list_destroy(guards);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="24">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Who has control?
+
+ds_grid_clear(localControl, 0);
+
+for (var a = 0; a &lt; instance_number(parentMob); a++)
+{var b = instance_find(parentMob, a);
+ var bx = b.x;
+ var by = b.y;
+ var bo = b.owner;
+
+ if point_distance(x, y, b.x, b.y) &lt;= guardDistance
+ {ds_grid_add(localControl, 0, bo, 1);}}
+
+var cMax = ds_grid_get_max(localControl, 0, 0, 0, ds_grid_height(localControl) - 1);
+var maxOwner = ds_grid_value_y(localControl, 0, 0, 0, ds_grid_height(localControl) - 1, cMax);
+
+if (cMax &gt; 0)
+{if (ds_grid_get_sum(localControl, 0, 0, 0, ds_grid_height(localControl) - 1) - cMax &lt;= 0)
+ {if maxOwner != owner
+  {owner = maxOwner;
+   color = control.playerColor[owner];
+
+   show_debug_message("player " + owner + " takes control of point " + id + "!");}}}
+
+/*  
+show_debug_message("guard post " + id);
+for (var c = 0; c &lt; ds_grid_height(localControl); c++)
+{show_debug_message(c + " - " + ds_grid_get(localControl, 0, c));}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Spawning
+
+spawn += max(level, 1);
+spawn = min(maxSpawn, spawn);
+
+if (owner &gt;= 0)
+{if spawn &gt;= maxSpawn
+ {if ds_grid_get(control.units, owner, 0) &lt; ds_grid_get(control.units, owner, 1)
+  {event_user(9);}}}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="19">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Spawn a dude
+
+spawn = 0;
+ds_grid_add(control.units, owner, 0, 1);
+
+if owner == 0
+{var a = instance_create(x, y, objectInfantry);}
+if owner == 1
+{var a = instance_create(x, y, objectCannon);}
+
+a.owner = owner;
+a.guarding = id;
+ds_list_add(guards, a);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="3">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Cleanup
+
+ds_grid_destroy(localControl);
+ds_list_destroy(guards);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// priority stuff
+
+draw_set_colour(c_red);
+{draw_text(x - 16, y + 32, ds_priority_find_priority(control.team0, id));}
+draw_set_colour(c_yellow);
+{draw_text(x + 16, y + 32, ds_priority_find_priority(control.team1, id));}
+</string>
+          </argument>
+        </arguments>
+      </action>
     </event>
   </events>
   <PhysicsObject>0</PhysicsObject>

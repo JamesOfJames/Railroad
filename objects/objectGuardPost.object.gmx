@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>&lt;undefined&gt;</parentName>
+  <parentName>parentGuarded</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -48,9 +48,33 @@ event_inherited();
         <arguments>
           <argument>
             <kind>1</kind>
+            <string>/// Setup
+
+grid = control.grid;
+guardDistance = grid * 4;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
             <string>/// Initialize Shader
 
-image_speed = 0.01;
+image_speed = 0;
 
 // get shader constant handle
 colour_to_find = shader_get_uniform(sShaderDemo5, "f_Colour1");
@@ -61,6 +85,80 @@ colorIn = shader_get_uniform(shColorReplaceBlend, "colorIn");
 colorOut = shader_get_uniform(shColorReplaceBlend, "colorOut");
 colorTolerance = shader_get_uniform(shColorReplaceBlend, "colorTolerance");
 blend = shader_get_uniform(shColorReplaceBlend, "blend");
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Post-creation Setup
+
+alarm[11] = 1;
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="2" enumb="11">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// event_inherited();
+
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Owner Color
+
+if owner &lt; 0
+{color = c_blue;}
+else
+{color = control.playerColor[owner];}
 </string>
           </argument>
         </arguments>
@@ -83,35 +181,71 @@ blend = shader_get_uniform(shColorReplaceBlend, "blend");
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>/// Color Swap Shader
+            <string>/// event_inherited();
 
-/*if( shader_is_compiled(sShaderDemo5) )
-{shader_set(sShaderDemo5);
+event_inherited();
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Draw Guard Distance
 
- // 1,1,1 = PURE white (each channel is 0 to 1)
- shader_set_uniform_f(colour_to_find, 1, 0, 1);       
-
- // 1,0,0 = red
- shader_set_uniform_f(colour_to_set, 0, 0, 1);
- 
- draw_sprite(sprite_index,image_index,x, y);   
- shader_reset();}
- 
-*/
+draw_set_colour(c_white);
+draw_set_alpha(0.2);
+draw_circle(x, y, guardDistance, true);
+draw_set_alpha(0.1);
+draw_circle(x, y, guardDistance, false);
+draw_set_alpha(1);
+draw_set_colour(c_black);
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Color Swap Shader - good?
 
 if( shader_is_compiled(shColorReplaceBlend) )
-{
-
-shader_set(shColorReplaceBlend);
+{shader_set(shColorReplaceBlend);
 
  // 1,1,1,1 = PURE white (each RGBA channel is 0 to 1)
- shader_set_uniform_f(colorIn, 0, 1, 0, 1);       
- shader_set_uniform_f(colorOut, 0, 0, 1, 1);
+ shader_set_uniform_f(colorIn, 0, 1, 0, 1);
+ shader_set_uniform_f(colorOut, color_get_red(color) / 256, color_get_green(color) / 256, color_get_blue(color) / 256, 1);
  shader_set_uniform_f(colorTolerance, 0.1, 0.1, 1, 1); 
  shader_set_uniform_f(blend, 1); 
 
- draw_sprite(sprite_index, image_index, x, y);   
- shader_reset();}
+ draw_sprite_ext(sprite_index, image_index, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha);}
+shader_reset();
 </string>
           </argument>
         </arguments>
