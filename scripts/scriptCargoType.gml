@@ -6,28 +6,28 @@ switch (cargo)
   str = "Coal";
   break;
  case 1:
-  str = "Blueprint";
+  str = "Artifact";
   break;
  case 2:
-  str = "Scuppers";
+  str = "Cloth";
   break;
  case 3:
-  str = "Chumwally";
+  str = "Food";
   break;
  case 4:
-  str = "Fizzlers";
+  str = "Goods";
   break;
  case 5:
-  str = "Jaberwork";
+  str = "Ore";
   break;
  case 6:
-  str = "Soup Doors";
+  str = "Logs";
   break;
  case 7:
-  str = "Submarine";
+  str = "Mail";
   break;
  case 8:
-  str = "Hot Pockets";
+  str = "Passengers";
   break;
  default:
   str = "Quanta";
